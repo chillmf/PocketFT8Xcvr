@@ -1,0 +1,20 @@
+Userinterface.cpp
+Added varialble: Line 48: int auto_flag
+Edited Application Messages: linne 325
+
+button.cpp
+Removed Unnecessary code: Line 61: //void waitForFT8timeslot(void);  chh thinks this is unnesscary
+
+Sequencer.cpp
+Editted Application Messages: Line 492
+Added auto_flag code:  line 753
+Removed call to setAutoReplyToCQ(false): Line 1224
+Added code to reply at Frequency of CQing Station: line 516 and 1277
+
+traffic_manager.cpp
+Found that after startup when you touch waterfall the Transmit Clock was started when the
+CLK0 frequency was set. Problem is in Si5351 driver. Force CLK0 off before and after setting
+frequency.  Line:166
+
+Waterfall.cpp
+Changed Start Up Frequency to 1000: Line 20
