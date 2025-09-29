@@ -490,10 +490,10 @@ void Sequencer::cqMsgEvent(Decode* msg) {
     // Avoid responding to previously logged duplicates unless enabled by CONFIG.JSON
     String dupMsg;
     if (config.enableDuplicates) {
-        dupMsg = String("Robo reply dup, ") + String(msg->field2);
+        dupMsg = String("Robo reply ") + String(msg->field2);
         ui.applicationMsgs->setText(dupMsg.c_str());
     } else if (ContactLogFile::isKnownCallsign(msg->field2)) {
-        dupMsg = String("Robo ignore dup, ") + String(msg->field2);
+        dupMsg = String("Robo ignore ") + String(msg->field2);
         ui.applicationMsgs->setText(dupMsg.c_str());
         return;  // RoboOp ignores stations already in the log
     }
