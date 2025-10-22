@@ -9,7 +9,7 @@
 #define ft8_buffer 400  // arbitrary for 3 kc
 #define ft8_min_bin 48
 #define FFT_Resolution 6.25
-#define ft8_min_freq FFT_Resolution* ft8_min_bin
+//#define ft8_min_freq FFT_Resolution* ft8_min_bin
 
 // Define the number of message samples.  To the best of my knowledge:
 //   + The audio pipeline queues blocks of time domain samples at the rate of 6400 samples/second

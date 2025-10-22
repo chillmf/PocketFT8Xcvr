@@ -185,11 +185,7 @@ int ft8_xmit_counter;
 int master_decoded;
 
 int tune_flag;  // Yep... true when we transmit a dead carrier for tuning
-
 int log_flag, logging_on;  // TODO:  deprecate old, old logging stuff
-
-//extern int auto_flag;
-//extern void display_value(int x, int y, int value);
 
 // Get a reference to the QSO Sequencer machine implementing a robo-like operator handling
 // FT8 QSO sequencing.
@@ -289,10 +285,6 @@ FLASHMEM void setup(void) {
     delay(10);
     si5351.set_pll_input(SI5351_PLLA, SI5351_PLL_INPUT_CLKIN);  // We are using cmos CLKIN, not a XTAL input!!!
     delay(10);
-    // si5351.set_pll_input(SI5351_PLLB, SI5351_PLL_INPUT_CLKIN);  // All PLLs using CLKIN
-    // delay(10);
-    // si5351.set_pll(SI5351_PLL_FIXED, SI5351_PLLA);              // Fixed point division offers less jitter
-    // delay(10);
     si5351.set_freq(3276800, SI5351_CLK2);  // Receiver's fixed frequency clock for Si4735 PLL
     delay(10);
     si5351.output_enable(SI5351_CLK2, 1);  // Receiver's clock is always on
@@ -437,7 +429,6 @@ FLASHMEM void loop() {
 
     // Apparently:  Have we acquired all of the timeslot's receiver time-domain data?
     if (decode_flag == 1) {
-        // unsigned long td0 = millis();
         num_decoded_msg = ft8_decode();  // Decode the received messages
         master_decoded = num_decoded_msg;
         decode_flag = 0;
@@ -481,15 +472,15 @@ FLASHMEM void loop() {
             setTime(gpsHelper.hour, gpsHelper.minute, gpsHelper.second, gpsHelper.day, gpsHelper.month, gpsHelper.year);
 
             // Now set the battery-backed Teensy RTC to the GPS-derived time in the MCU
-            // Teensy3Clock.set(now());
+            Teensy3Clock.set(now());
             DPRINTF("hour():minute():second() = %02u:%02u:%02u, timeStatus()=%u, getTeensy3Time()=%lu\n", hour(), minute(), second(), timeStatus(), getTeensy3Time());
 
             // Use the GPS-derived locator unless config.json hardwired it to something else
-            if (strlen(config.locator) == 0) {
-                thisStation.setLocator(get_mh(gpsHelper.flat, gpsHelper.flng, 4));
+           // if (strlen(config.locator) == 0) {
+           //     thisStation.setLocator(get_mh(gpsHelper.flat, gpsHelper.flng, 4));
                 // strlcpy(Locator, get_mh(gpsHelper.flat, gpsHelper.flng, 4), sizeof(Locator));
                 ui.displayLocator(thisStation.getLocator(), A_GREEN);
-            }
+           // }
 
             // Arrange for the Teensy battery-backed RTC (UTC) to keep the MCU time accurate
             setSyncProvider(getTeensy3Time);
@@ -525,8 +516,6 @@ time_t getTeensy3Time() {
 FLASHMEM void loadSSB() {
     si4735.queryLibraryId();  // Is it really necessary here? I will check it.
     si4735.patchPowerUp();
-    // si4735.setPowerUp(1, 1, 1, 0, 1, SI473X_ANALOG_DIGITAL_AUDIO);
-    // si4735.radioPowerUp();
     delay(50);
     si4735.downloadPatch(ssb_patch_content, size_content);
     // Parameters
@@ -599,35 +588,9 @@ static void copy_to_fft_buffer(void *destination, const void *source) {
         *dst++ = *src++;  // real sample plus a zero for imaginary
     }
 
-    // //Configurable recording of raw 16-bit audio at 6400 samples/second to an SD file
-    // if (ft8Raw != NULL) {
-    //   ft8Raw.write(source, AUDIO_BLOCK_SAMPLES * sizeof(uint16_t));
-    //   recordSampleCount += AUDIO_BLOCK_SAMPLES;  //Increment count of recorded samples
-    //   if (recordSampleCount % (unsigned)AUDIO_SAMPLE_RATE == 0) {
-    //     DPRINTF("Audio recording in progress...\n");  //One second progress indicator
-    //   }
-    // }
 
 }  // copy_to_fft_buffer()
 
-// /**
-//  * Updates synchronization using Teensy's TimeLib
-//  *
-//  * Accuracy limited to +/- 1 second
-//  *
-//  * Appears to be dead code
-//  **/
-// void rtc_synchronization() {
-//   DPRINTF("*****rtc_synchronization()\n");
-//   getTeensy3Time();
-
-//   if (ft8_flag == 0 && second() % 15 == 0) {
-//     ft8_flag = 1;
-//     FT_8_counter = 0;
-//     ft8_marker = 1;
-//     WF_counter = 0;
-//   }
-// }
 
 /**
  * Update timeslot synchronization using Arduino's elapsed time, millis()
@@ -651,11 +614,6 @@ void update_synchronization() {
     current_time = millis();
     ft8_time = current_time - start_time;  // mS elapsed in current interval???
 
-    // ft8_hours = (int8_t)(ft8_time / 3600000);
-    // hours_fraction = ft8_time % 3600000;
-    // ft8_minutes = (int8_t)(hours_fraction / 60000);
-    // ft8_seconds = (int8_t)((hours_fraction % 60000) / 1000);
-
     // Charlie's original sync decision used 200 mS now 160 mS (one FT8 symbol time)
     // TODO:  Is our time accurate enough to reduce window below 160 mS???
     if (ft8_flag == 0 && ft8_time % 15000 <= 160) {
@@ -666,8 +624,6 @@ void update_synchronization() {
 
         // Notify sequencer
         seq.timeslotEvent();  // Increments sequence number for upcoming timeslot
-
-        //display_value(270, 258, auto_flag);
 
         // Debug missed timeslots (we are too late to receive the first symbol)
         if (current_time > nextTimeSlot + 160) {
@@ -696,8 +652,7 @@ void update_synchronization() {
  *
  **/
 void sync_FT8(void) {
-    // DPRINTF("*****sync_FT8()\n");
-
+    
     setSyncProvider(getTeensy3Time);  // commented out?
 
     start_time = millis();
@@ -733,7 +688,7 @@ void waitForFT8timeslot(void) {
     // DPRINTF("waitForFT8timeslot() gpsHelper.validFix=%u\n", gpsHelper.validGPSdata);
 
     // displayInfoMsg("Waiting for timeslot");
-    ui.applicationMsgs->setText("Awaiting FT8 timeslot");
+    ui.applicationMsgs->setText("Awaiting Timeslot");
 
     // If we have valid GPS data, then use GPS time for milliseconds rather than second resolution
     if (gpsHelper.validGPSdata) {
@@ -764,9 +719,6 @@ void waitForFT8timeslot(void) {
     // Notify the sequencer
     seq.timeslotEvent();
 
-    // Update display
-    // displayInfoMsg("RECV");
-    // displayInfoMsg(" ");
     ui.applicationMsgs->setText("Ready");
 
     DPRINTF("-----Timeslot %lu: second()=%u, millis()=%lu ---------------------\n", seq.getSequenceNumber(), millis());

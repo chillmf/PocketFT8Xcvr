@@ -10,6 +10,13 @@
 
 #include "msgTypes.h"
 
+#define DISPLAY_DECODED_LINES 9  
+
+#define TEXT2_WIDTH 12                                    // Pixels
+#define TEXT2_HEIGHT 16                                   // Pixels
+#define TEXT2_LEADING 4                                   // Space between lines
+#define TEXT2_LINE_HEIGHT (TEXT2_HEIGHT + TEXT2_LEADING)  // Line height including text and leading
+
 int ft8_decode(void);
 
 static const String sp = String(" ");
@@ -66,15 +73,13 @@ void save_Answer_CQ_List(void);
 void display_Answer_CQ_Items(void);
 
 int Check_Calling_Stations(int num_decoded);
-void clear_CQ_List_box(void);
-//void display_details(int decoded_messages);
+//void clear_CQ_List_box(void);
 void display_messages(int decoded_messages);
-void clear_display_details(void);
-int Check_CQ_Calling_Stations(int num_decoded, int reply_state);
-int Check_QSO_Calling_Stations(int num_decoded, int reply_state);
-void Check_CQ_Stations(int num_decoded);
-
-void display_selected_call(int index);
-void process_selected_CQ(void);
+//void clear_display_details(void);
+//int Check_CQ_Calling_Stations(int num_decoded, int reply_state);
+//int Check_QSO_Calling_Stations(int num_decoded, int reply_state);
+//void Check_CQ_Stations(int num_decoded);
+//void display_selected_call(int index);
+//void process_selected_CQ(void);
 
 char rsl2s(int rsl);

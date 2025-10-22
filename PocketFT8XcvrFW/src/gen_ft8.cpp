@@ -21,42 +21,24 @@
 extern HX8357_t3n tft;
 
 #include <string.h>
-
 #include "arm_math.h"
 #include "decode_ft8.h"
-// #include "display.h"
 #include "locator.h"
 #include "UserInterface.h"
 #include "msgTypes.h"
 #include "traffic_manager.h"
 #include "PocketFT8Xcvr.h"
 
-char Your_Call[] = "W5XXX";
-char Your_Locator[] = "AA00";
 
-char test_station[] = "W5BAA";
-char test_target[] = "W5ITU";
-char test_RSL[] = "R-15";
 
 char Target_Call[7];     // six character call sign + /0
-char Target_Locator[5];  // four character locator  + /0
 int Target_RSL;          // their RSL
-char CQ_Target_Call[7];
 
-char reply_message[18];
-char reply_message_list[18][8];
-int reply_message_count;
 char message[18];   // FT8 message text pending transmission.
 int message_state;  // Non-zero => message[] is valid/ready (but nothing checks it???)
 
-extern int log_flag, logging_on;
 extern time_t getTeensy3Time();
-
-char ft8_time_string[] = "15:44:15";
-
 extern UserInterface ui;
-
-int max_displayed_messages = 8;
 
 /**
  * Setup required parameters for constructing messages to remote target station
@@ -106,19 +88,13 @@ char* get_message() {
  *
  **/
 void set_message(uint16_t index) {
-    // char big_gulp[60];
     uint8_t packed[K_BYTES];
-    // char blank[] = "                   ";
     char seventy_three[] = "RR73";
-    // char Reply_State[20];
-
-    // DPRINTF("set_message(%u)\n", index);
 
     getTeensy3Time();
     char rtc_string[10];  // print format stuff
     snprintf(rtc_string, sizeof(rtc_string), "%2i:%2i:%2i", hour(), minute(), second());
 
-    // strlcpy(message, blank, sizeof(message));
     clearOutboundMessageText();
     clearOutboundMessageDisplay();
 
@@ -164,11 +140,6 @@ void set_message(uint16_t index) {
 
     message_state = 1;
 
-    //	sprintf(big_gulp,"%s %s", rtc_string, message);
-    //	if (logging_on == 1) write_log_data(big_gulp);
-
-    // DPRINTF("message='%s'\n", message);
-
 }  // set_message()
 
 /**
@@ -197,30 +168,13 @@ void set_message(char* freeText) {
 
     message_state = 1;
 
-    //	sprintf(big_gulp,"%s %s", rtc_string, message);
-    //	if (logging_on == 1) write_log_data(big_gulp);
-
-    // DPRINTF("message='%s'\n", message);
 }
 
 void clearOutboundMessageText(void) {
-    // char blank[] = "                   ";
-    // strlcpy(message, blank, sizeof(message));
     message[0] = 0;
 }
 
 void clearOutboundMessageDisplay(void) {
-    // DTRACE();
-
-    // char blank[] = "                      ";
-    // tft.setTextColor(HX8357_YELLOW, HX8357_BLACK);
-    // // tft.setTextSize(2);
-    // tft.setCursor(DISPLAY_OUTBOUND_X, DISPLAY_OUTBOUND_Y);
-    // tft.print(blank);
     message_state = 0;
 }
 
-//?????
-void clear_reply_message_box(void) {
-    tft.fillRect(0, 100, 400, 140, HX8357_BLACK);
-}

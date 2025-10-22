@@ -71,12 +71,6 @@ void readConfigFile() {
 
     configFile.close();
 
-    // Report configuration
-    // String configMsg = String("call=") + String(config.callsign) + String(" freq=") + String(config.frequency) + String(" kHz\n");
-    // if (config.enableDuplicates) configMsg += String("enableDuplicates==1 ");
-    // configMsg += String("log=") + String(config.logFilename) + String(" name=") + String(config.myName);
-    // configMsg += String(" M0='") + String(config.m0) + String("'");
-    // ui.applicationMsgs->setText(configMsg.c_str());
 
     // Determine the amateur band's min/max frequencies for the configured operating frequency (needed by Si4735)
     config.lowerFrequencyLimit = getLowerBandLimit(config.operatingFrequency);  // kHz

@@ -21,13 +21,8 @@ extern SI4735 si4735;
 extern int xmit_flag, ft8_xmit_counter, Transmit_Armned;
 
 extern int num_decoded_msg;
-
-// extern int offset_freq;
-
 uint64_t F_Long, F_FT8, F_Offset;
-
 extern int tune_flag;
-
 extern UserInterface ui;
 
 /**
@@ -37,11 +32,8 @@ extern UserInterface ui;
 void transmit_sequence(void) {
     DTRACE();
 
-    // ui.applicationMsgs->setText(get_message(), A_RED);
-
     // Program the transmitter clock at F_Long
     set_Xmit_Freq();
-    // si5351.set_freq(F_Long, SI5351_CLK0);
 
     // Disconnect receiver from antenna and enable the SN74ACT244 PA
     pinMode(PIN_RCV, OUTPUT);
@@ -194,7 +186,5 @@ void setup_to_transmit_on_next_DSP_Flag(void) {
     DTRACE();
     ft8_xmit_counter = 0;  // Reset symbol slot counter
     transmit_sequence();   // Turns-on the transmitter carrier at current F_Long ??
-    // set_Xmit_Freq();                         //Recalculates F_long and reprograms SI5351 ??
     xmit_flag = 1;  // This flag appears to trigger loop() to modulate the carrier
-    // ui.applicationMsgs->setText(get_message(), A_RED);  // Display transmitted message
 }
